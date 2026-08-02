@@ -1,0 +1,35 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v4
+
+      - name: Extrair o projeto do CupomTracker.zip
+        run: unzip -o CupomTracker.zip
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Compilar o APK de debug
+        working-directory: CupomTracker
+        run: gradle assembleDebug --stacktrace
+
+      - name: Disponibilizar o APK para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: CupomTracker-debug-apk
+          path: CupomTracker/app/build/outputs/apk/debug/app-debug.apk
